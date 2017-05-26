@@ -1,4 +1,4 @@
-
+![Project Logo](https://github.com/Rossi1337/svg2java/blob/master/misc/logo.png "Logo")
 # Introduction
 This project is licensed under BSD license.
 See license.txt for details.
@@ -66,7 +66,7 @@ com.btr.svg2java.Svg2Java2D
 So to start the GUI test program you have to download and extract the binary distribution,
 unzip all jar files to a folder and execute in this folder
 
-java -jar svg2java_20101123.jar  
+**java -jar svg2java_20101123.jar**  
 
 This will launch the program.
 
