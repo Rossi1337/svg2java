@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ====================================================================== 
+ SVG2Java    
+ Build file mainly used to create a deployment jar.
+                  
+ - Bernd Rosstauscher                                                                 
+====================================================================== -->
+
+<project name="svg2java" default="all">
+
+	<description>
+    	Build file mainly used to create a deployment jar. 
+    </description>
+
+	<!-- Properties ======================================================= -->
+
+	<property name="src" location="src"/>
+	<property name="classes" location="bin"/>
+	<property name="doc" location="doc"/>
+	<property name="libs" location="lib"/>
+	<property name="deploy" location="deploy"/>
+
+	<!-- Tasks ============================================================ -->
+
+	<target name="init">
+		<delete dir="${classes}" />
+		<mkdir dir="${classes}" />
+		<mkdir dir="${classes}/images" />
+		<mkdir dir="${deploy}" />
+	</target>
+
+	<target name="compile" depends="init" description="compile the source ">
+		<javac debug="true" classpath="${libs}/batik-all.jar;${libs}/jsyntaxpane-0.9.5-b29.jar" 
+			srcdir="${src}" destdir="${classes}" source="1.6" target="1.6" > 
+		</javac>
+		<copy todir="${classes}">
+		   <fileset dir="${src}"> 
+		    	<include name="**/*.templ"/>
+		   </fileset>
+		</copy>
+		<copy todir="${classes}/images/">
+		   <fileset dir="misc"> 
+		    	<include name="splash.png"/>
+		   </fileset>
+		</copy>
+	</target>
+
+	<target name="compile_test" depends="compile" description="compile the source of the test classes">
+		<javac debug="true" classpath="${libs}/batik-all.jar;${libs}/jsyntaxpane-0.9.5-b29.jar;classes" 
+			srcdir="test" destdir="${classes}" source="1.6" target="1.6" > 
+		</javac>
+	</target>
+	
+	<target name="build_src_zip" depends="gen_doc" description="generate the src zip">
+		<tstamp />
+		<zip destfile="${deploy}/svg2java_${DSTAMP}_src.zip">
+			<fileset dir="">
+				<include name="**/*" />
+				<exclude name="bin/**/*" />
+				<exclude name="**/*.zip" />
+				<exclude name="**/.svn" />
+			</fileset>
+		</zip>
+	</target>
+	
+	<target name="build_bin_zip" depends="create_jar" description="generate the binary zip">
+			<tstamp />
+			<zip destfile="${deploy}/svg2java_${DSTAMP}_bin.zip">
+				<fileset dir="deploy">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="lib">
+					<include name="*.jar" />
+				</fileset>
+				<fileset dir="">
+					<include name="*.txt" />
+				</fileset>
+			</zip>
+		</target>
+	
+	<target name="create_jar" depends="compile,compile_test" description="generate the main jar">
+		<tstamp />
+		<jar jarfile="${deploy}/svg2java_${DSTAMP}.jar" basedir="${classes}">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+				<attribute name="Implementation-Vendor" value="BTR" />
+				<attribute name="Implementation-Title" value="svg2java" />
+				<attribute name="Implementation-Version" value="${DSTAMP}" />
+
+				<attribute name="Class-Path" value="batik-all.jar jsyntaxpane-0.9.5-b29.jar xerces_2_5_0.jar xml-apis-ext.jar xml-apis.jar" />
+				<attribute name="Main-Class" value="com.btr.svg2java.test.swing.Svg2Java2D" />
+				<attribute name="SplashScreen-Image" value="images/splash.png" />
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="gen_doc" description="Generate the JavaDoc.">
+		<javadoc classpath="${libs}/batik-all.jar" sourcepath="${src}" excludepackagenames="org.apache.*" destdir="${doc}/api"></javadoc>
+		<copy file="misc/stylesheet.css" todir="${doc}/api/" overwrite="true" />
+	</target>
+	
+	<target name="all" depends="build_bin_zip, build_src_zip" description="Build all" />
+
+</project>
